@@ -2,42 +2,19 @@ from colorama import Style, Fore
 import os
 
 class main:
-    piece = "bishop"
     LEFT_EDGE = (1 << 0) | (1 << 8) | (1 << 16) | (1 << 24) | (1 << 32) | (1 << 40) | (1 << 48) | (1 << 56)
     RIGHT_EDGE = (1 << 7) | (1 << 15) | (1 << 23) | (1 << 31) | (1 << 39) | (1 << 47) | (1 << 55) | (1 << 63)
     UPPEAR_LIMIT = 64
     LOWER_LIMIT = -1
 
-    def get_all_bishop_moves(self, position_index: int) -> int:
-        bitboard_moves = 0
+    def get_all_white_pawn_moves(self, position_index: int) -> int:
+        bitboard_moves = (1<<position_index + 8)
 
-        # Do all upper moves
-        for i in range(position_index + 8, self.UPPEAR_LIMIT, +8):
-            bitboard_moves = bitboard_moves | (1 << i)
+        if not self._is_on_right_edge(position_index) and position_index + 9 < self.UPPEAR_LIMIT:
+            bitboard_moves = bitboard_moves | (1 << position_index + 9)
 
-        # Do all lower moves
-        for i in range(position_index - 8, self.LOWER_LIMIT, -8):
-            bitboard_moves = bitboard_moves | (1 << i)
-
-        # Do all right moves
-        if not self._is_on_right_edge(position_index):
-            i = 1
-            while True:
-                bitboard_moves = bitboard_moves | (1 << position_index + i)
-                if self._is_on_right_edge(position_index + i):
-                    break
-                i = i + 1
-
-        # Do all left moves
         if not self._is_on_left_edge(position_index):
-            i = 1
-            while True:
-                bitboard_moves = bitboard_moves | (1 << position_index - i)
-                if self._is_on_left_edge(position_index - i):
-                    break
-                i = i + 1
-
-        return bitboard_moves
+            bitboard_moves = bitboard_moves | (1 << position_index + 7        )
 
     def remove_square(self, bitboard, square_index):
         # 1. Create a bitboard with only the target square set: (1 << square_index)
