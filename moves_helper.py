@@ -1,4 +1,5 @@
 from constants import *
+from colorama import Fore, Style
 
 class MovesHelper:
     BISHOP_CACHED_ALL_MOVES_PATH = "chess_engine_all_moves/bishop"
@@ -11,10 +12,15 @@ class MovesHelper:
     KNIGHT_CACHED_BLOCKER_MOVES_PATH = "chess_engine_blocker_moves/knight"
     KING_CACHED_BLOCKER_MOVES_PATH = "chess_engine_blocker_moves/king"
 
+    LEFT_EDGE =   (1 << 0) | (1 << 8) | (1 << 16) | (1 << 24) | (1 << 32) | (1 << 40) | (1 << 48) | (1 << 56)
+    RIGHT_EDGE =  (1 << 7) | (1 << 15) | (1 << 23) | (1 << 31) | (1 << 39) | (1 << 47) | (1 << 55) | (1 << 63)
+    UPPEAR_LIMIT = 64
+    LOWER_LIMIT = -1 
+
     _instance = None
 
     @staticmethod
-    def convert_lookups_into_dicts(folder_path: str, position_index: int) -> dict:
+    def _convert_lookups_into_dicts(folder_path: str, position_index: int) -> dict:
         data = {}
 
         with open(f"{folder_path}/{position_index}.txt", "r") as f:
@@ -40,7 +46,7 @@ class MovesHelper:
                 cls._instance.all_moves_data[piece] = {}
 
                 for pos in range(64):
-                    cls._instance.all_moves_data[piece][pos] = MovesHelper.convert_lookups_into_dicts(path, pos)
+                    cls._instance.all_moves_data[piece][pos] = MovesHelper._convert_lookups_into_dicts(path, pos)
 
             # Create blocker moves dict data
             cls._instance.blocker_moves_data = {}
@@ -50,7 +56,7 @@ class MovesHelper:
                 cls._instance.blocker_moves_data[piece] = {}
 
                 for pos in range(64):
-                    cls._instance.blocker_moves_data[piece][pos] = MovesHelper.convert_lookups_into_dicts(path, pos)
+                    cls._instance.blocker_moves_data[piece][pos] = MovesHelper._convert_lookups_into_dicts(path, pos)
 
         return cls._instance
 
@@ -86,11 +92,37 @@ class MovesHelper:
         return all_legal_moves
 
     def get_legal_pawn_moves(self, position_index: int, white_board: int, black_board: int, color) -> int:
+        if color == COLOR_WHITE:
+            return self._legal_pawn_moves(position_index, white_board, black_board, 
+                                          position_index + 9, position_index + 7, position_index + 8)
+        else:
+            return self._legal_pawn_moves(position_index, black_board, white_board, 
+                                          position_index - 7, position_index - 9, position_index - 8)
+
+    
+    def _legal_pawn_moves(self, position_index, own_board, enemy_board, 
+                          right_step, left_step, forward_step):
         possible_moves = 0
 
+        if not self._is_occupied((own_board | enemy_board), forward_step):
+            possible_moves = possible_moves | (1 << forward_step)
+
+        if not self._is_on_left_edge(position_index) and self._is_occupied(enemy_board, left_step):
+            possible_moves = possible_moves | (1 << left_step)
+
+        if not self._is_on_right_edge(position_index) and self._is_occupied(enemy_board, right_step):
+            possible_moves = possible_moves | (1 << right_step)
+
+        return possible_moves
 
     def _is_occupied(self,  board_map: int, position_index: int) -> bool:
         return (board_map >> position_index & 1) > 0
+
+    def _is_on_right_edge(self, position_index: int) -> bool:
+        return (self.RIGHT_EDGE & (1 << position_index)) > 0
+
+    def _is_on_left_edge(self, position_index: int) -> bool:
+        return (self.LEFT_EDGE & (1 << position_index)) > 0
 
     def _get_legal_moves(self, piece, position_index: int, white_board: int, black_board: int, color) -> int:
         """
@@ -118,6 +150,21 @@ class MovesHelper:
 
         return possible_moves
 
+
+
+
+
+
+def print_board(board):
+    for row in range(7, -1, -1):
+        for col in range(8):
+            bit = (board >> (row * 8 + col)) & 1
+            if bit:
+                print(Fore.GREEN + "1" + Style.RESET_ALL, end=" ")
+            else:
+                print("0", end=" ")
+        print()
+
 if __name__ == '__main__':
-    legal_moves = MovesHelper().get_legal_horizontal_vertical_moves(28, 2**4, 2**24 + 2**26, COLOR_BLACK)
-    print('x')
+    legal_moves = MovesHelper().get_legal_diagonal_moves(34, 0, 0, COLOR_WHITE)
+    print_board(legal_moves)
