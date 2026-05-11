@@ -7,7 +7,7 @@ class Piece:
         self.position_index = initial_position_index
         self.moves_helper = MovesHelper()
 
-    def get_all_legal_moves(self, own_board: int, enemy_board: int):
+    def get_all_legal_moves(self, white_board: int, black_board: int):
         raise NotImplementedError
 
     def get_all_possible_captures(self, all_legal_moves: int, white_board: int, black_board: int):
