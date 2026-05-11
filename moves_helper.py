@@ -1,16 +1,21 @@
+import os
+
 from constants import *
 from colorama import Fore, Style
 
 class MovesHelper:
-    BISHOP_CACHED_ALL_MOVES_PATH = "chess_engine_all_moves/bishop"
-    ROOK_CACHED_ALL_MOVES_PATH = "chess_engine_all_moves/rook"
-    KNIGHT_CACHED_ALL_MOVES_PATH = "chess_engine_all_moves/knight"
-    KING_CACHED_ALL_MOVES_PATH = "chess_engine_all_moves/king"
 
-    BISHOP_CACHED_BLOCKER_MOVES_PATH = "chess_engine_blocker_moves/bishop"
-    ROOK_CACHED_BLOCKER_MOVES_PATH = "chess_engine_blocker_moves/rook"
-    KNIGHT_CACHED_BLOCKER_MOVES_PATH = "chess_engine_blocker_moves/knight"
-    KING_CACHED_BLOCKER_MOVES_PATH = "chess_engine_blocker_moves/king"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    BISHOP_CACHED_ALL_MOVES_PATH = os.path.join(base_dir, "chess_engine_all_moves/bishop")
+    ROOK_CACHED_ALL_MOVES_PATH = os.path.join(base_dir, "chess_engine_all_moves/rook")
+    KNIGHT_CACHED_ALL_MOVES_PATH = os.path.join(base_dir, "chess_engine_all_moves/knight")
+    KING_CACHED_ALL_MOVES_PATH = os.path.join(base_dir, "chess_engine_all_moves/king")
+
+    BISHOP_CACHED_BLOCKER_MOVES_PATH = os.path.join(base_dir, "chess_engine_blocker_moves/bishop")
+    ROOK_CACHED_BLOCKER_MOVES_PATH = os.path.join(base_dir, "chess_engine_blocker_moves/rook")
+    KNIGHT_CACHED_BLOCKER_MOVES_PATH = os.path.join(base_dir, "chess_engine_blocker_moves/knight")
+    KING_CACHED_BLOCKER_MOVES_PATH = os.path.join(base_dir, "chess_engine_blocker_moves/king")
 
     LEFT_EDGE =   (1 << 0) | (1 << 8) | (1 << 16) | (1 << 24) | (1 << 32) | (1 << 40) | (1 << 48) | (1 << 56)
     RIGHT_EDGE =  (1 << 7) | (1 << 15) | (1 << 23) | (1 << 31) | (1 << 39) | (1 << 47) | (1 << 55) | (1 << 63)
@@ -60,7 +65,7 @@ class MovesHelper:
 
         return cls._instance
 
-
+    # ------ REGULAR MOVES ------
     def get_legal_diagonal_moves(self, position_index: int, white_board: int, black_board: int, color) -> int:
         return self._get_legal_moves(BISHOP, position_index, white_board, black_board, color)
 
@@ -99,7 +104,7 @@ class MovesHelper:
             return self._legal_pawn_moves(position_index, black_board, white_board, 
                                           position_index - 7, position_index - 9, position_index - 8)
 
-    
+    # ------ HELPER MOVES ------
     def _legal_pawn_moves(self, position_index, own_board, enemy_board, 
                           right_step, left_step, forward_step):
         possible_moves = 0
@@ -114,15 +119,6 @@ class MovesHelper:
             possible_moves = possible_moves | (1 << right_step)
 
         return possible_moves
-
-    def _is_occupied(self,  board_map: int, position_index: int) -> bool:
-        return (board_map >> position_index & 1) > 0
-
-    def _is_on_right_edge(self, position_index: int) -> bool:
-        return (self.RIGHT_EDGE & (1 << position_index)) > 0
-
-    def _is_on_left_edge(self, position_index: int) -> bool:
-        return (self.LEFT_EDGE & (1 << position_index)) > 0
 
     def _get_legal_moves(self, piece, position_index: int, white_board: int, black_board: int, color) -> int:
         """
@@ -150,8 +146,24 @@ class MovesHelper:
 
         return possible_moves
 
+    # ------ ACTIONS ------
+    def move_piece(self, position_index: int, new_position_index: int, own_board: int, enemy_board: int) -> (int, int):
+        enemy_board = enemy_board & ~(1 << new_position_index)
+        own_board = own_board & ~(1 << position_index)
 
+        own_board = own_board | (1 << new_position_index)
 
+        return own_board, enemy_board
+
+    # ------ GENERAL HELPERS ------
+    def _is_occupied(self,  board_map: int, position_index: int) -> bool:
+        return (board_map >> position_index & 1) > 0
+
+    def _is_on_right_edge(self, position_index: int) -> bool:
+        return (self.RIGHT_EDGE & (1 << position_index)) > 0
+
+    def _is_on_left_edge(self, position_index: int) -> bool:
+        return (self.LEFT_EDGE & (1 << position_index)) > 0
 
 
 
