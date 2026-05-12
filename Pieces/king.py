@@ -1,9 +1,10 @@
 from Pieces.piece import Piece
+from Pieces.rook import Rook
 from constants import *
 
 class King(Piece):
     def __init__(self, color, initial_position_index: int, 
-                 kingside_rook, queenside_rook):
+                 kingside_rook: Rook, queenside_rook: Rook):
         super().__init__(color, initial_position_index)
         self.can_still_castle = True
 
@@ -34,3 +35,31 @@ class King(Piece):
                 legal_castling_moves = legal_castling_moves | (1 << 2)
         
         return legal_castling_moves
+    
+    def move_piece(self, new_position_index, white_board, black_board):
+        if not self.can_still_castle:
+            return super().move_piece(new_position_index, white_board, black_board)
+        
+        old_position = self.position_index
+        self.position_index = new_position_index
+
+        if self.color == COLOR_WHITE:
+            if new_position_index == 6:
+                white_board, black_board = self.moves_helper.move_piece(old_position, 6, white_board, black_board)
+                return self.kingside_rook.move_piece(5, white_board, black_board)
+            
+            if new_position_index == 2:
+                white_board, black_board = self.moves_helper.move_piece(old_position, 6, white_board, black_board)
+                return self.queenside_rook.move_piece(3, white_board, black_board)
+            
+        else:
+            if new_position_index == 62:
+                white_board, black_board = self.moves_helper.move_piece(old_position, 62, white_board, black_board)
+                return self.kingside_rook.move_piece(61, white_board, black_board)
+            
+            if new_position_index == 58:
+                white_board, black_board = self.moves_helper.move_piece(old_position, 58, white_board, black_board)
+                return self.queenside_rook.move_piece(59, white_board, black_board)
+
+        self.can_still_castle = False
+        return self.moves_helper.move_piece(old_position, new_position_index, black_board, white_board)

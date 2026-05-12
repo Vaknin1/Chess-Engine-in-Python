@@ -17,9 +17,10 @@ class Piece:
         return all_legal_moves & white_board
 
     def move_piece(self, new_position_index: int, white_board: int, black_board: int) -> (int, int):
+        old_position = self.position_index
         self.position_index = new_position_index
 
         if self.color == COLOR_WHITE:
-            return self.moves_helper.move_piece(self.position_index, new_position_index, white_board, black_board)
+            return self.moves_helper.move_piece(old_position, new_position_index, white_board, black_board)
 
-        return self.moves_helper.move_piece(self.position_index, new_position_index, black_board, white_board)
+        return self.moves_helper.move_piece(old_position, new_position_index, black_board, white_board)
