@@ -1,4 +1,5 @@
 from Pieces.piece import Piece
+from evaluation.evaluator_config import PAWN_VALUE
 
 class Pawn(Piece):
 
@@ -9,4 +10,6 @@ class Pawn(Piece):
         return self.moves_helper.get_legal_pawn_moves(self.position_index, white_board, black_board, self.color)
 
         # Should implement En Passaunt or whatever its called
-        
+
+    def get_piece_value(self) -> int:
+        return PAWN_VALUE

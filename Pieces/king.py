@@ -1,6 +1,7 @@
 from Pieces.piece import Piece
 from Pieces.rook import Rook
 from constants import *
+from evaluation.evaluator_config import KING_VALUE
 
 class King(Piece):
     def __init__(self, color, initial_position_index: int, 
@@ -63,3 +64,6 @@ class King(Piece):
 
         self.can_still_castle = False
         return self.moves_helper.move_piece(old_position, new_position_index, black_board, white_board)
+
+    def get_piece_value(self) -> int:
+        return KING_VALUE

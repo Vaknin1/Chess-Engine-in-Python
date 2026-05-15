@@ -1,7 +1,5 @@
-
-
 from Pieces.piece import Piece
-
+from evaluation.evaluator_config import BISHOP_VALUE
 
 class Bishop(Piece):
     def __init__(self, color, initial_position_index):
@@ -13,4 +11,5 @@ class Bishop(Piece):
                                                           black_board, 
                                                           self.color)
     
-    
+    def get_piece_value(self) -> int:
+        return BISHOP_VALUE

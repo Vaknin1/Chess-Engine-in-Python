@@ -1,5 +1,6 @@
 from Pieces.piece import Piece
 from constants import *
+from evaluation.evaluator_config import QUEEN_VALUE
 
 class Queen(Piece):
     def __init__(self, color, initial_position_index: int):
@@ -11,3 +12,5 @@ class Queen(Piece):
                 + self.moves_helper.get_legal_horizontal_vertical_moves
                         (self.position_index, white_board, black_board, self.color))
 
+    def get_piece_value(self) -> int:
+        return QUEEN_VALUE

@@ -1,8 +1,6 @@
-
-
 from Pieces.king import King
 from Pieces.piece import Piece
-
+from evaluation.evaluator_config import ROOK_VALUE
 
 class Rook(Piece):
 
@@ -16,3 +14,6 @@ class Rook(Piece):
     def move_piece(self, new_position_index, white_board, black_board):
         self.has_moved = True
         return super().move_piece(new_position_index, white_board, black_board)
+
+    def get_piece_value(self) -> int:
+        return ROOK_VALUE

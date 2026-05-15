@@ -24,3 +24,10 @@ class Piece:
             return self.moves_helper.move_piece(old_position, new_position_index, white_board, black_board)
 
         return self.moves_helper.move_piece(old_position, new_position_index, black_board, white_board)
+
+    def get_piece_value(self) -> int:
+        raise NotImplementedError
+
+
+    def get_position_index(self):
+        return self.position_index
